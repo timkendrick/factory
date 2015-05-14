@@ -12,25 +12,22 @@ var Promise = require('promise');
 
 module.exports = function(options) {
 	var templatePath = options.template;
-	var templateOptions = options.options;
+	var templatePlaceholders = options.placeholders;
 
 	return function(destination, config, callback) {
-		return parseOptions(templateOptions, config)
+		return parseOptions(config, templatePlaceholders)
 			.then(function(context) {
 				return copyDirectory(templatePath, destination, context);
 			}).nodeify(callback);
 	};
 };
 
-function parseOptions(options, config) {
+function parseOptions(config, placeholders) {
 	config = config || {};
+	placeholders = placeholders || [];
 
 	return new Promise(function(resolve, reject) {
-		if (!options) {
-			return resolve({});
-		}
-
-		var prompts = options.filter(function(option) {
+		var prompts = placeholders.filter(function(option) {
 			var optionName = option.name;
 			return !config.hasOwnProperty(optionName);
 		});

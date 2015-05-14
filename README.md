@@ -17,14 +17,16 @@ var factory = require('factory');
 
 var widgetFactory = factory({
 	template: 'templates/widget',
-	options: [
+	placeholders: [
 		{
 			name: 'foo',
-			type: 'input'
+			type: 'input',
+			message: 'Enter a value for foo'
 		},
 		{
 			name: 'bar',
-			type: 'input'
+			type: 'input',
+			message: 'Enter a value for bar'
 		}
 	]
 });
