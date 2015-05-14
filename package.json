@@ -1,0 +1,31 @@
+{
+  "name": "factory",
+  "version": "0.0.1",
+  "description": "Quick and easy template scaffolding",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timkendrick/factory.git"
+  },
+  "author": "Tim Kendrick <timkendrick@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/timkendrick/factory/issues"
+  },
+  "homepage": "https://github.com/timkendrick/factory",
+  "devDependencies": {
+    "extend": "^2.0.0",
+    "glob": "^5.0.3",
+    "inquirer": "^0.8.2",
+    "ncp": "^2.0.0",
+    "promise": "^6.1.0"
+  },
+  "dependencies": {
+    "istextorbinary": "^1.0.2",
+    "lodash-template-stream": "^1.0.0",
+    "lodash.template": "^3.5.1"
+  }
+}
