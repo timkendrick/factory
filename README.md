@@ -28,7 +28,10 @@ var widgetFactory = factory({
 			type: 'input',
 			message: 'Enter a value for bar'
 		}
-	]
+	],
+	options: {
+		overwrite: true
+	}
 });
 
 var destination = 'widgets';
@@ -80,10 +83,12 @@ Template filenames/contents can use [lodash template](https://www.npmjs.com/pack
 
 Options:
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `template` | `string` | Yes | Path to the template file/folder |
-| `placeholders` | `array` | No | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| `template` | `string` | Yes | N/A | Path to the template file/folder |
+| `placeholders` | `array` | No | `[]` | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
+| `options | `object` | No | `{}` | Copy options |
+| `options.overwrite | `boolean` | `false` | Whether to overwrite existing files |
 
 Returns:
 
