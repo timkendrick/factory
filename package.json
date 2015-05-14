@@ -16,16 +16,13 @@
     "url": "https://github.com/timkendrick/factory/issues"
   },
   "homepage": "https://github.com/timkendrick/factory",
-  "devDependencies": {
+  "dependencies": {
     "extend": "^2.0.0",
     "glob": "^5.0.3",
     "inquirer": "^0.8.2",
+    "istextorbinary": "^1.0.2",
+    "lodash.template": "^3.5.1",
     "ncp": "^2.0.0",
     "promise": "^6.1.0"
-  },
-  "dependencies": {
-    "istextorbinary": "^1.0.2",
-    "lodash-template-stream": "^1.0.0",
-    "lodash.template": "^3.5.1"
   }
 }
