@@ -30,25 +30,17 @@ function parseOptions(options, config) {
 			return resolve({});
 		}
 
-		var context = options.reduce(function(context, option) {
-			var optionName = option.name;
-			context[optionName] = config.hasOwnProperty(optionName) ? config[optionName] : null;
-			return context;
-		}, {});
-
 		var prompts = options.filter(function(option) {
 			var optionName = option.name;
 			return !config.hasOwnProperty(optionName);
 		});
 
 		if (prompts.length === 0) {
-			return resolve(context);
+			return resolve(config);
 		}
 
 		inquirer.prompt(prompts, function(answers) {
-			Object.keys(answers).forEach(function(optionName) {
-				context[optionName] = answers[optionName];
-			});
+			var context = extend(config, answers);
 			return resolve(context);
 		});
 	});
