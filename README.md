@@ -31,7 +31,7 @@ var widgetFactory = factory({
 	]
 });
 
-var destination = './widgets';
+var destination = 'widgets';
 var context = {
 	foo: 'baz'
 };
@@ -44,6 +44,21 @@ widgetFactory(destination, context, function(error, callback) {
 });
 ```
 
+Contents of `templates/widget/<%= foo %>.js`:
+
+```javascript
+module.exports = function <%= foo %>() {
+	console.log('<%= bar %>');
+};
+```
+
+Output at `widgets/baz.js`:
+
+```javascript
+module.exports = function baz() {
+	console.log('[user-prompted value]');
+};
+```
 
 ## How it works
 
@@ -61,17 +76,22 @@ widgetFactory(destination, context, function(error, callback) {
 
 Create a factory from an existing template
 
+Template filenames/contents can use [lodash template](https://www.npmjs.com/package/lodash.template) syntax to specify placeholder values. These are injected into the template when the factory is invoked.
+
 Options:
 
-| Name | Required | Description |
-| ---- | -------- | ----------- |
-| `template` | Yes | Path to the template file/folder |
-| `placeholders` | No | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to inject data into templates |
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| `template` | `string` | Yes | Path to the template file/folder |
+| `placeholders` | `array` | No | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
 
 Returns:
 
 - `function(destination, [context])`
 
  	Factory function used to create instances of the template
+ 	
+ 	The user will be prompted for the value of any placeholders which are not specified in the `context` object.
+ 	
 	- `destination`: Destination directory for output files
 	- `context`: Preset template placeholder values
