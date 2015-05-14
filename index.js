@@ -6,7 +6,7 @@ var Promise = require('promise');
 var extend = require('extend');
 var glob = require('glob');
 var inquirer = require('inquirer');
-var ncp = require('ncp');
+var cprf = require('cprf');
 var template = require('lodash.template');
 var istextorbinary = require('istextorbinary');
 
@@ -48,26 +48,14 @@ function parseOptions(options, config) {
 
 function copyDirectory(source, destination, context) {
 	return new Promise(function(resolve, reject) {
-		var ncpOptions = {
-			clobber: true,
-			dereference: false,
-			stopOnErr: true,
-			rename: function(target) {
-				return expandPlaceholders(target, context);
-			},
-			transform: function(read, write, file) {
-				read
-					.pipe(templateStream(context, file.name))
-					.pipe(write);
-			}
-		};
-		ncp.limit = 16;
-		ncp(source, destination, ncpOptions, function(error) {
+		cprf(source, destination, function(error) {
 			if (error) {
 				return reject(error);
-			} else {
-				return resolve();
 			}
+		}).on('copy', function(stats, src, dest, copy) {
+			var transform = templateStream(src, context);
+			dest = expandPlaceholders(dest, context);
+			copy(src, dest, transform);
 		});
 	});
 }
