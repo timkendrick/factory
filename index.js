@@ -2,13 +2,13 @@
 
 var path = require('path');
 var Transform = require('stream').Transform;
-var Promise = require('promise');
+var cprf = require('cprf');
 var extend = require('extend');
 var glob = require('glob');
 var inquirer = require('inquirer');
-var cprf = require('cprf');
-var template = require('lodash.template');
 var istextorbinary = require('istextorbinary');
+var template = require('lodash.template');
+var Promise = require('promise');
 
 module.exports = function(options) {
 	var templatePath = options.template;
@@ -58,30 +58,30 @@ function copyDirectory(source, destination, context) {
 			copy(src, dest, transform);
 		});
 	});
-}
 
-function expandPlaceholders(templateString, context) {
-	var containsPlaceholders = templateString.indexOf('<%') !== -1;
-	if (!containsPlaceholders) { return templateString; }
-	var templateFunction = template(templateString);
-	return templateFunction(context);
-}
-
-function templateStream(context, filename) {
-	var stream = new Transform({ decodeStrings: false, encoding: 'utf8' });
-	stream._transform = function(chunk, encoding, done) {
-		var isBuffer = Buffer.isBuffer(chunk);
-		var isTextFile = !isBuffer || istextorbinary.isTextSync(filename, chunk);
-		if (isTextFile) {
-			var templateString = isBuffer ? chunk.toString() : chunk;
-			var containsPlaceholders = templateString.indexOf('<%') !== -1;
-			if (containsPlaceholders) {
-				chunk = template(templateString)(context);
-				encoding = 'utf8';
+	function templateStream(filename, context) {
+		var stream = new Transform({ decodeStrings: false, encoding: 'utf8' });
+		stream._transform = function(chunk, encoding, done) {
+			var isBuffer = Buffer.isBuffer(chunk);
+			var isTextFile = !isBuffer || istextorbinary.isTextSync(filename, chunk);
+			if (isTextFile) {
+				var templateString = isBuffer ? chunk.toString() : chunk;
+				var containsPlaceholders = templateString.indexOf('<%') !== -1;
+				if (containsPlaceholders) {
+					chunk = template(templateString)(context);
+					encoding = 'utf8';
+				}
 			}
-		}
-		this.push(chunk, encoding);
-		done();
-	};
-	return stream;
+			this.push(chunk, encoding);
+			done();
+		};
+		return stream;
+	}
+
+	function expandPlaceholders(templateString, context) {
+		var containsPlaceholders = templateString.indexOf('<%') !== -1;
+		if (!containsPlaceholders) { return templateString; }
+		var templateFunction = template(templateString);
+		return templateFunction(context);
+	}
 }
