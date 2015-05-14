@@ -1,6 +1,6 @@
-# factory
+# Factory
 
-> Quick and easy template scaffolding
+> Quick and easy template scaffolding for Node
 
 
 ## Installation
