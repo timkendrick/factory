@@ -1,10 +1,8 @@
 'use strict';
 
-var path = require('path');
 var Transform = require('stream').Transform;
 var cprf = require('cprf');
 var extend = require('extend');
-var glob = require('glob');
 var inquirer = require('inquirer');
 var istextorbinary = require('istextorbinary');
 var template = require('lodash.template');
