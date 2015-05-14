@@ -92,11 +92,20 @@ Options:
 
 Returns:
 
-- `function(destination, [context])`
+- `function(destination, [context], [callback])`
 
  	Factory function used to create instances of the template
  	
  	The user will be prompted for the value of any placeholders which are not specified in the `context` object.
  	
-	- `destination`: Destination directory for output files
-	- `context`: Preset template placeholder values
+ 	Options: 
+ 	
+ 	| Name | Type | Required | Default | Description |
+	| ---- | ---- | -------- | ------- | ----------- |
+	| `destination` | `string` | Yes | N/A | Destination directory for output files |
+	| `context` | `object` | No | `{}` | Preset template placeholder values |
+	| `callback` | `function` | No | `null` | Node-style callback that is invoked when the operation completes/fails |
+
+	Returns:
+
+	- `Promise`: Promise that is fulfilled when the operation completes/fails
