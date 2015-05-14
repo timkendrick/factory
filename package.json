@@ -23,6 +23,7 @@
     "istextorbinary": "^1.0.2",
     "lodash.template": "^3.5.1",
     "ncp": "^2.0.0",
+    "path-exists": "^1.0.0",
     "promise": "^7.0.1"
   }
 }

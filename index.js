@@ -8,24 +8,33 @@ var glob = require('glob');
 var inquirer = require('inquirer');
 var istextorbinary = require('istextorbinary');
 var template = require('lodash.template');
+var pathExists = require('path-exists');
 var Promise = require('promise');
 
 module.exports = function(options) {
 	var templatePath = options.template;
-	var templatePlaceholders = options.placeholders;
+	var templatePlaceholders = options.placeholders || [];
+	var copyOptions = options.options || {};
 
 	return function(destination, config, callback) {
+		if (!destination) {
+			throw new Error('No destination path specified');
+		} else if (typeof destination !== 'string') {
+			throw new Error('Invalid destination path');
+		}
+		if ((arguments.length === 2) && (typeof config === 'function')) {
+			callback = config;
+			config = undefined;
+		}
+		config = config || {};
 		return parseOptions(config, templatePlaceholders)
 			.then(function(context) {
-				return copyDirectory(templatePath, destination, context);
+				return copyDirectory(templatePath, destination, context, copyOptions);
 			}).nodeify(callback);
 	};
 };
 
 function parseOptions(config, placeholders) {
-	config = config || {};
-	placeholders = placeholders || [];
-
 	return new Promise(function(resolve, reject) {
 		var prompts = placeholders.filter(function(option) {
 			var optionName = option.name;
@@ -43,7 +52,7 @@ function parseOptions(config, placeholders) {
 	});
 }
 
-function copyDirectory(source, destination, context) {
+function copyDirectory(source, destination, context, options) {
 	return new Promise(function(resolve, reject) {
 		cprf(source, destination, function(error) {
 			if (error) {
@@ -52,7 +61,17 @@ function copyDirectory(source, destination, context) {
 		}).on('copy', function(stats, src, dest, copy) {
 			var transform = templateStream(src, context);
 			dest = expandPlaceholders(dest, context);
-			copy(src, dest, transform);
+			if (options.overwrite) {
+				copy(src, dest, transform);
+			} else {
+				pathExists(dest, function(error, exists) {
+					if (!exists) {
+						copy(src, dest, transform);
+					} else {
+						throw new Error('Destination path not empty: ' + dest);
+					}
+				});
+			}
 		});
 	});
 
