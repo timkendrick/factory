@@ -18,11 +18,11 @@
   "homepage": "https://github.com/timkendrick/factory",
   "dependencies": {
     "extend": "^2.0.0",
-    "glob": "^5.0.3",
-    "inquirer": "^0.8.2",
+    "glob": "^5.0.6",
+    "inquirer": "^0.8.4",
     "istextorbinary": "^1.0.2",
     "lodash.template": "^3.5.1",
     "ncp": "^2.0.0",
-    "promise": "^6.1.0"
+    "promise": "^7.0.1"
   }
 }
