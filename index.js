@@ -167,9 +167,10 @@ function copyDirectory(source, destination, context, options) {
 
 function fsError(code, path) {
 	var errorType = errno.code[code];
-	var cause = extend({}, errorType, {
-		path: path,
-		message: errorType.code + ', ' + errorType.description + ' ' + path
-	});
-	return new errno.custom.FilesystemError(cause);
+	var message = errorType.code + ', ' + errorType.description + ' ' + path;
+	var error = new Error(message);
+	error.errno = errorType.errno;
+	error.code = errorType.code;
+	error.path = path;
+	return error;
 }
