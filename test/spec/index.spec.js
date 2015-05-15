@@ -104,9 +104,9 @@ describe('factory()', function() {
 		expect(actual).to.eql(expected);
 
 		response.forEach(function(file) {
-			expected = fs.Stats;
-			actual = file.stats;
-			expect(actual).to.be.an.instanceof(expected);
+			expected = 'function';
+			actual = file.stats && file.stats.isDirectory;
+			expect(actual).to.be.a(expected);
 		});
 	}
 
