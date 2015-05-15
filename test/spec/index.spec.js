@@ -43,7 +43,13 @@ describe('factory()', function() {
 
 	after(function() {
 		resetInquirer();
-		fs.rmdirSync(OUTPUT_DIR);
+		try {
+			fs.rmdirSync(OUTPUT_DIR);
+		} catch (error) {
+			del.sync(path.join(OUTPUT_DIR, '**/*'), {
+				force: true
+			});
+		}
 	});
 
 	function getTemplatePath(template) {
