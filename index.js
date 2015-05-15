@@ -2,12 +2,14 @@
 
 var Transform = require('stream').Transform;
 var fs = require('fs');
+var path = require('path');
 var Promise = require('promise');
 var cprf = require('cprf');
 var errno = require('errno');
 var extend = require('extend');
 var inquirer = require('inquirer');
 var istextorbinary = require('istextorbinary');
+var junk = require('junk');
 var template = require('lodash.template');
 
 module.exports = function(options) {
@@ -88,6 +90,9 @@ function copyDirectory(source, destination, context, options) {
 				}
 				return resolve(copiedFiles);
 			}).on('copy', function(srcStats, src, dest, copy) {
+				var filename = path.basename(src);
+				var isJunkFile = junk.is(filename);
+				if (isJunkFile) { return; }
 				try {
 					dest = expandPlaceholders(dest, context);
 				} catch (error) {
