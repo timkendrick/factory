@@ -4,7 +4,7 @@
   "description": "Quick and easy template scaffolding for Node",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -17,12 +17,22 @@
   },
   "homepage": "https://github.com/timkendrick/factory",
   "dependencies": {
+    "cprf": "^2.0.1",
+    "errno": "^0.1.2",
     "extend": "^2.0.0",
     "inquirer": "^0.8.4",
     "istextorbinary": "^1.0.2",
     "lodash.template": "^3.5.1",
-    "ncp": "^2.0.0",
-    "path-exists": "^1.0.0",
     "promise": "^7.0.1"
+  },
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "chai-as-promised": "^5.0.0",
+    "del": "^1.1.1",
+    "mocha": "^2.2.4",
+    "read-dir-files": "^0.1.1",
+    "rewire": "^2.3.3",
+    "sinon": "^1.14.1",
+    "sinon-chai": "^2.7.0"
   }
 }
