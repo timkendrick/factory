@@ -196,11 +196,10 @@ describe('factory()', function() {
 							var actual, expected;
 							actual = files;
 							expected = {
-								nested1: {
+								nested: {
 									file1: 'Hello, world!\n',
 									file2: 'Hello, world!\n'
 								},
-								nested2: {},
 								file: 'Hello, world!\n'
 							};
 							expect(actual).to.eql(expected);
@@ -220,10 +219,9 @@ describe('factory()', function() {
 				.then(function(returnValue) {
 					var templateName = 'directory';
 					var expectedFilenames = [
-						'nested1',
-						'nested1/file1',
-						'nested1/file2',
-						'nested2',
+						'nested',
+						'nested/file1',
+						'nested/file2',
 						'file'
 					];
 					checkResponse(returnValue, templateName, expectedFilenames);
