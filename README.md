@@ -1,4 +1,4 @@
-# Factory  [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
+# Factory  [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
 > Quick and easy template scaffolding for Node
 
