@@ -29,6 +29,7 @@ describe('factory()', function() {
 			fs.mkdirSync(OUTPUT_DIR);
 		} catch (error) {
 			del.sync(path.join(OUTPUT_DIR, '**/*'), {
+				dot: true,
 				force: true
 			});
 		}
@@ -37,6 +38,7 @@ describe('factory()', function() {
 	afterEach(function() {
 		mockInquirer.prompt.reset();
 		del.sync(path.join(OUTPUT_DIR, '**/*'), {
+			dot: true,
 			force: true
 		});
 	});
@@ -47,6 +49,7 @@ describe('factory()', function() {
 			fs.rmdirSync(OUTPUT_DIR);
 		} catch (error) {
 			del.sync(path.join(OUTPUT_DIR, '**/*'), {
+				dot: true,
 				force: true
 			});
 		}
