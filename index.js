@@ -22,6 +22,11 @@ module.exports = function(options) {
 			callback = context;
 			context = undefined;
 		}
+		if (typeof options === 'string') {
+			options = {
+				destination: options
+			};
+		}
 		context = context || {};
 		options = options || {};
 		return processTemplate(options, context)

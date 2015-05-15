@@ -187,6 +187,20 @@ describe('factory()', function() {
 				});
 		});
 
+		it('should allow destination shorthand', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('file')
+			});
+
+			return templateFactory(getOutputPath())
+				.then(function(returnValue) {
+					var actual, expected;
+					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
+					expected = 'Hello, world!\n';
+					expect(actual).to.equal(expected);
+				});
+		});
+
 		it('should recursively copy directories', function() {
 			var templateFactory = factory({
 				template: getTemplatePath('directory')
