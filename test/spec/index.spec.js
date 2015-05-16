@@ -124,55 +124,6 @@ describe('factory()', function() {
 			expect(actual).to.be.a(expected);
 		});
 
-		it('should throw an error if an invalid destination path is specified', function() {
-			var templateFactory = factory({
-				template: getTemplatePath('file')
-			});
-
-			var actual, expected;
-			actual = [
-				templateFactory(),
-				templateFactory({}),
-				templateFactory({ destination: undefined }),
-				templateFactory({ destination: null }),
-				templateFactory({ destination: false }),
-				templateFactory({ destination: {} }),
-				templateFactory({ destination: [] })
-			];
-			expected = 'ENOENT';
-			return Promise.all(actual.map(function(actual) {
-				return expect(actual).to.be.rejectedWith(expected);
-			}));
-		});
-
-		it('should throw an error if the source path does not exist', function() {
-			var templateFactory = factory({
-				template: getTemplatePath('nonexistent')
-			});
-
-			var actual, expected;
-			var options = {
-				destination: getOutputPath()
-			};
-			actual = templateFactory(options);
-			expected = 'ENOENT';
-			return expect(actual).to.be.rejectedWith(expected);
-		});
-
-		it('should throw an error if an invalid source path is specified', function() {
-			var templateFactory = factory({
-				template: getTemplatePath('invalid')
-			});
-
-			var actual, expected;
-			var options = {
-				destination: getOutputPath()
-			};
-			actual = templateFactory(options);
-			expected = 'ENOTDIR';
-			return expect(actual).to.be.rejectedWith(expected);
-		});
-
 		it('should copy single files', function() {
 			var templateFactory = factory({
 				template: getTemplatePath('file')
@@ -556,6 +507,58 @@ describe('factory()', function() {
 
 					expect(mockInquirer.prompt).not.to.have.been.called;
 				});
+		});
+	});
+
+	describe('argument validation', function() {
+
+		it('should throw an error if an invalid source path is specified', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('invalid')
+			});
+
+			var actual, expected;
+			var options = {
+				destination: getOutputPath()
+			};
+			actual = templateFactory(options);
+			expected = 'ENOTDIR';
+			return expect(actual).to.be.rejectedWith(expected);
+		});
+
+		it('should throw an error if an invalid destination path is specified', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('file')
+			});
+
+			var actual, expected;
+			actual = [
+				templateFactory(),
+				templateFactory({}),
+				templateFactory({ destination: undefined }),
+				templateFactory({ destination: null }),
+				templateFactory({ destination: false }),
+				templateFactory({ destination: {} }),
+				templateFactory({ destination: [] })
+			];
+			expected = 'ENOENT';
+			return Promise.all(actual.map(function(actual) {
+				return expect(actual).to.be.rejectedWith(expected);
+			}));
+		});
+
+		it('should throw an error if the source path does not exist', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('nonexistent')
+			});
+
+			var actual, expected;
+			var options = {
+				destination: getOutputPath()
+			};
+			actual = templateFactory(options);
+			expected = 'ENOENT';
+			return expect(actual).to.be.rejectedWith(expected);
 		});
 	});
 
