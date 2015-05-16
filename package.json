@@ -17,14 +17,13 @@
   },
   "homepage": "https://github.com/timkendrick/factory",
   "dependencies": {
-    "cprf": "^2.0.1",
     "errno": "^0.1.2",
     "extend": "^2.0.0",
     "inquirer": "^0.8.4",
     "istextorbinary": "^1.0.2",
-    "junk": "^1.0.1",
     "lodash.template": "^3.5.1",
-    "promise": "^7.0.1"
+    "promise": "^7.0.1",
+    "recursive-copy": "^1.0.2"
   },
   "devDependencies": {
     "chai": "^2.3.0",

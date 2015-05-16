@@ -1,15 +1,13 @@
 'use strict';
 
-var Transform = require('stream').Transform;
 var fs = require('fs');
-var path = require('path');
+var Transform = require('stream').Transform;
 var Promise = require('promise');
-var cprf = require('cprf');
 var errno = require('errno');
 var extend = require('extend');
 var inquirer = require('inquirer');
 var istextorbinary = require('istextorbinary');
-var junk = require('junk');
+var copy = require('recursive-copy');
 var template = require('lodash.template');
 
 module.exports = function(options) {
@@ -29,22 +27,25 @@ module.exports = function(options) {
 		}
 		context = context || {};
 		options = options || {};
-		return processTemplate(options, context)
-			.nodeify(callback);
-	};
-
-
-	function processTemplate(options, context) {
 		return parseOptions(context, templatePlaceholders)
 			.then(function(context) {
+				var source = templatePath;
 				var destination = options.destination;
+				var isValidSource = (typeof source === 'string');
+				if (!isValidSource) {
+					return Promise.reject(fsError('ENOENT', source));
+				}
 				var isValidDestination = (typeof destination === 'string');
 				if (!isValidDestination) {
 					return Promise.reject(fsError('ENOENT', destination));
 				}
-				return copyDirectory(templatePath, destination, context, options);
-			});
-	}
+				return ensureValidSource(source)
+					.then(function() {
+						return copyDirectory(source, destination, context, options);
+					});
+			})
+			.nodeify(callback);
+	};
 };
 
 function parseOptions(context, placeholders) {
@@ -65,74 +66,32 @@ function parseOptions(context, placeholders) {
 	});
 }
 
+function ensureValidSource(path) {
+	return new Promise(function(resolve, reject) {
+		fs.stat(path, function(error, stats) {
+			if (error) {
+				return reject(error);
+			}
+			if (!stats.isDirectory()) {
+				return reject(fsError('ENOTDIR', path));
+			}
+			return resolve();
+		});
+	});
+}
+
 function copyDirectory(source, destination, context, options) {
-	return ensureValidSource(source)
-		.then(function() {
-			return copyFiles(source, destination, context, options);
-		});
+	return copy(source, destination, {
+		overwrite: options.overwrite,
+		dot: true,
+		rename: function(filePath) {
+			return expandPlaceholders(filePath, context);
+		},
+		transform: function(src, dest, stats) {
+			return templateStream(src, context);
+		}
+	});
 
-
-	function ensureValidSource(path) {
-		return new Promise(function(resolve, reject) {
-			fs.stat(path, function(error, stats) {
-				if (error) {
-					return reject(error);
-				}
-				if (!stats.isDirectory()) {
-					return reject(fsError('ENOTDIR', path));
-				}
-				return resolve();
-			});
-		});
-	}
-
-	function copyFiles(source, destination, context, options) {
-		return new Promise(function(resolve, reject) {
-			var copiedFiles = [];
-			cprf(source, destination, function(error) {
-				if (error) {
-					return reject(error);
-				}
-				return resolve(copiedFiles);
-			}).on('copy', function(srcStats, src, dest, copy) {
-				var filename = path.basename(src);
-				var isJunkFile = junk.is(filename);
-				if (isJunkFile) { return; }
-				try {
-					dest = expandPlaceholders(dest, context);
-				} catch (error) {
-					return reject(error);
-				}
-				if (options.overwrite) {
-					copyFile(src, dest, srcStats);
-				} else {
-					fs.stat(dest, function(error, destStats) {
-						if (error && error.code !== 'ENOENT') {
-							return reject(error);
-						}
-						if (destStats && (!srcStats.isDirectory() || !destStats.isDirectory())) {
-							return reject(fsError('EEXIST', destination));
-						}
-						copyFile(src, dest, srcStats);
-					});
-				}
-
-
-				function copyFile(src, dest, stats) {
-					var transform = templateStream(src, context);
-					transform.on('error', function(error) {
-						return reject(error);
-					});
-					copy(src, dest, transform);
-					copiedFiles.push({
-						src: src,
-						dest: dest,
-						stats: stats
-					});
-				}
-			});
-		});
-	}
 
 	function templateStream(filename, context) {
 		var stream = new Transform({ decodeStrings: false, encoding: 'utf8' });

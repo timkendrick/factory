@@ -89,9 +89,9 @@ describe('factory()', function() {
 		};
 	}
 
-	function checkResponse(response, templateName, expectedFilenames) {
+	function checkResults(results, templateName, expectedFilenames) {
 		var actual, expected;
-		actual = response.reduce(function(files, file) {
+		actual = results.reduce(function(files, file) {
 			files[file.src] = file.dest;
 			return files;
 		}, {});
@@ -106,7 +106,7 @@ describe('factory()', function() {
 		}, {});
 		expect(actual).to.eql(expected);
 
-		response.forEach(function(file) {
+		results.forEach(function(file) {
 			expected = 'function';
 			actual = file.stats && file.stats.isDirectory;
 			expect(actual).to.be.a(expected);
@@ -133,7 +133,7 @@ describe('factory()', function() {
 				destination: getOutputPath()
 			};
 			return templateFactory(options)
-				.then(function(returnValue) {
+				.then(function(results) {
 					var actual, expected;
 					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
 					expected = 'Hello, world!\n';
@@ -147,7 +147,7 @@ describe('factory()', function() {
 			});
 
 			return templateFactory(getOutputPath())
-				.then(function(returnValue) {
+				.then(function(results) {
 					var actual, expected;
 					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
 					expected = 'Hello, world!\n';
@@ -164,7 +164,7 @@ describe('factory()', function() {
 				destination: getOutputPath()
 			};
 			return templateFactory(options)
-				.then(function(returnValue) {
+				.then(function(results) {
 					return getOutputFiles()
 						.then(function(files) {
 							var actual, expected;
@@ -190,7 +190,7 @@ describe('factory()', function() {
 				destination: getOutputPath()
 			};
 			return templateFactory(options)
-				.then(function(returnValue) {
+				.then(function(results) {
 					var templateName = 'directory';
 					var expectedFilenames = [
 						'nested',
@@ -198,7 +198,32 @@ describe('factory()', function() {
 						'nested/file2',
 						'file'
 					];
-					checkResponse(returnValue, templateName, expectedFilenames);
+					checkResults(results, templateName, expectedFilenames);
+				});
+		});
+
+		it('should filter out junk files', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('junk')
+			});
+
+			var options = {
+				destination: getOutputPath()
+			};
+			return templateFactory(options)
+				.then(function(results) {
+					return getOutputFiles()
+						.then(function(files) {
+							var actual, expected;
+							actual = files;
+							expected = {
+								nested: {
+									'.gitignore': '!*\n'
+								},
+								'.gitignore': '!*\n'
+							};
+							expect(actual).to.eql(expected);
+						});
 				});
 		});
 	});
@@ -218,7 +243,7 @@ describe('factory()', function() {
 					bar: 'bar'
 				}
 			)
-				.then(function(returnValue) {
+				.then(function(results) {
 					var actual, expected;
 					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
 					expected = 'foobar\n';
@@ -240,7 +265,7 @@ describe('factory()', function() {
 					bar: 'bar'
 				}
 			)
-				.then(function(returnValue) {
+				.then(function(results) {
 					return getOutputFiles()
 						.then(function(files) {
 							var actual, expected;
@@ -267,7 +292,7 @@ describe('factory()', function() {
 					bar: 'bar'
 				}
 			)
-				.then(function(returnValue) {
+				.then(function(results) {
 					return getOutputFiles()
 						.then(function(files) {
 							var actual, expected;
@@ -412,7 +437,7 @@ describe('factory()', function() {
 				foo: 'foo'
 			};
 			return templateFactory(options, context)
-				.then(function(returnValue) {
+				.then(function(results) {
 					var actual, expected;
 					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
 					expected = 'foobar\n';
@@ -451,7 +476,7 @@ describe('factory()', function() {
 				destination: getOutputPath()
 			};
 			return templateFactory(options)
-				.then(function(returnValue) {
+				.then(function(results) {
 					var actual, expected;
 					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
 					expected = 'foobar\n';
@@ -499,7 +524,7 @@ describe('factory()', function() {
 				bar: 'bar'
 			};
 			return templateFactory(options, context)
-				.then(function(returnValue) {
+				.then(function(results) {
 					var actual, expected;
 					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
 					expected = 'foobar\n';
@@ -571,15 +596,15 @@ describe('factory()', function() {
 			var options = {
 				destination: getOutputPath()
 			};
-			templateFactory(options, function(error, returnValue) {
-				expect(returnValue).to.exist;
+			templateFactory(options, function(error, results) {
+				expect(results).to.exist;
 				expect(error).not.to.exist;
 
 				var templateName = 'file';
 				var expectedFilenames = [
 					'file'
 				];
-				checkResponse(returnValue, templateName, expectedFilenames);
+				checkResults(results, templateName, expectedFilenames);
 
 				var actual, expected;
 				actual = fs.readFileSync(getOutputPath('file'), 'utf8');
@@ -598,9 +623,9 @@ describe('factory()', function() {
 			var options = {
 				destination: getOutputPath()
 			};
-			templateFactory(options, function(error, returnValue) {
+			templateFactory(options, function(error, results) {
 				expect(error).to.exist;
-				expect(returnValue).not.to.exist;
+				expect(results).not.to.exist;
 
 				var actual, expected;
 				actual = function() { throw error; };
@@ -624,15 +649,15 @@ describe('factory()', function() {
 				foo: 'foo',
 				bar: 'bar'
 			};
-			templateFactory(options, context, function(error, returnValue) {
-				expect(returnValue).to.exist;
+			templateFactory(options, context, function(error, results) {
+				expect(results).to.exist;
 				expect(error).not.to.exist;
 
 				var templateName = 'placeholders-content';
 				var expectedFilenames = [
 					'file'
 				];
-				checkResponse(returnValue, templateName, expectedFilenames);
+				checkResults(results, templateName, expectedFilenames);
 
 				var actual, expected;
 				actual = fs.readFileSync(getOutputPath('file'), 'utf8');
@@ -654,9 +679,9 @@ describe('factory()', function() {
 			var context = {
 				foo: 'foo'
 			};
-			templateFactory(options, context, function(error, returnValue) {
+			templateFactory(options, context, function(error, results) {
 				expect(error).to.exist;
-				expect(returnValue).not.to.exist;
+				expect(results).not.to.exist;
 
 				var actual, expected;
 				actual = function() { throw error; };
