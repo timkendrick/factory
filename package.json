@@ -1,6 +1,6 @@
 {
   "name": "factory",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Quick and easy template scaffolding for Node",
   "main": "index.js",
   "directories": {
