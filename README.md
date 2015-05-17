@@ -1,4 +1,7 @@
-# Factory [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges) [![Build Status](https://travis-ci.org/timkendrick/factory.svg?branch=master)](https://travis-ci.org/timkendrick/factory)
+# Factory
+[![npm version](https://img.shields.io/npm/v/factory.svg)](https://www.npmjs.com/package/factory)
+![Stability](https://img.shields.io/badge/stability-stable-brightgreen.svg)
+[![Build Status](https://travis-ci.org/timkendrick/factory.svg?branch=master)](https://travis-ci.org/timkendrick/factory)
 
 > Quick and easy template scaffolding for Node
 
