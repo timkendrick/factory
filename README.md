@@ -99,7 +99,7 @@ Options:
 | Name | Type | Required | Default | Description |
 | ---- | ---- | -------- | ------- | ----------- |
 | `template` | `string` | Yes | N/A | Path to the template folder |
-| `placeholders` | `array` | No | `[]` | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
+| `placeholders` | `Array` | No | `[]` | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
 
 Returns:
 
