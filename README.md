@@ -41,13 +41,23 @@ var options = {
 var context = {
 	foo: 'baz'
 };
-widgetFactory(options, context, function(error, callback) {
+
+// Node-style callback interface
+widgetFactory(options, context, function(error, results) {
 	if (error) {
 		console.error('Widget creation failed: ' + error);
 	} else {
 		console.info('Widget created successfully');
 	}
 });
+
+// Promise interface
+widgetFactory(options, context)
+	.then(function(results) {
+		console.info('Widget created successfully');
+	}).catch(function(error) {
+		console.error('Widget creation failed: ' + error);
+	});
 ```
 
 Contents of `templates/widget/<%= foo %>.js`:
