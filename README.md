@@ -120,7 +120,33 @@ Returns:
 
 	Returns:
 
-	- `Promise`: Promise that is fulfilled when the operation completes/fails
+	- `Promise<Array>` Promise, fulfilled with array of copy results:
+
+		```json
+		[
+			{
+				"src": "/path/to/src",
+				"dest": "/path/to/dest",
+				"stats": <Stats>
+			},
+			{
+				"src": "/path/to/src/file.txt",
+				"dest": "/path/to/dest/file.txt",
+				"stats": <Stats>
+			},
+			{
+				"src": "/path/to/src/subfolder",
+				"dest": "/path/to/dest/subfolder",
+				"stats": <Stats>
+			},
+			{
+				"src": "/path/to/src/subfolder/nested.txt",
+				"dest": "/path/to/dest/subfolder/nested.txt",
+				"stats": <Stats>
+			}
+		]
+		```
+
 
 ## Events
 
