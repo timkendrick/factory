@@ -540,7 +540,7 @@ describe('factory()', function() {
 			});
 
 			var options = {
-				destination: getOutputPath(),
+				destination: getOutputPath()
 			};
 			var context = {
 				foo: 'foo',
