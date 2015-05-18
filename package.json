@@ -30,13 +30,14 @@
   },
   "homepage": "https://github.com/timkendrick/factory",
   "dependencies": {
+    "emitter-mixin": "0.0.3",
     "errno": "^0.1.2",
     "extend": "^2.0.0",
     "inquirer": "^0.8.4",
     "istextorbinary": "^1.0.2",
     "lodash.template": "^3.5.1",
     "promise": "^7.0.1",
-    "recursive-copy": "^1.0.3"
+    "recursive-copy": "^1.0.7"
   },
   "devDependencies": {
     "chai": "^2.3.0",

@@ -11,11 +11,16 @@ var rewire = require('rewire');
 var del = require('del');
 var Promise = require('promise');
 var readDirFiles = require('read-dir-files');
+var emitterMixin = require('emitter-mixin');
 
 var factory = rewire('../../index');
 
 var TEMPLATES_PATH = path.resolve(__dirname, '../fixtures/templates');
 var OUTPUT_DIR = path.resolve(__dirname, '../fixtures/output');
+
+var COPY_EVENTS = Object.keys(factory.events).map(function(key) {
+	return factory.events[key];
+});
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -111,6 +116,24 @@ describe('factory()', function() {
 			actual = file.stats && file.stats.isDirectory;
 			expect(actual).to.be.a(expected);
 		});
+	}
+
+	function listenTo(emitter, eventNames) {
+		var events = [];
+		eventNames.forEach(function(eventName) {
+			emitter.on(eventName, createListener(eventName));
+		});
+		return events;
+
+
+		function createListener(eventName) {
+			return function(args) {
+				events.push({
+					name: eventName,
+					args: Array.prototype.slice.call(arguments)
+				});
+			};
+		}
 	}
 
 	describe('basic operation', function() {
@@ -690,6 +713,122 @@ describe('factory()', function() {
 
 				done();
 			});
+		});
+	});
+
+	describe('events', function() {
+
+		it('should export event names and values', function() {
+			var actual, expected;
+			actual = factory.events;
+			expected = {
+				ERROR: 'error',
+				COMPLETE: 'complete',
+				CREATE_DIRECTORY_START: 'createDirectoryStart',
+				CREATE_DIRECTORY_ERROR: 'createDirectoryError',
+				CREATE_DIRECTORY_COMPLETE: 'createDirectoryComplete',
+				CREATE_SYMLINK_START: 'createSymlinkStart',
+				CREATE_SYMLINK_ERROR: 'createSymlinkError',
+				CREATE_SYMLINK_COMPLETE: 'createSymlinkComplete',
+				COPY_FILE_START: 'copyFileStart',
+				COPY_FILE_ERROR: 'copyFileError',
+				COPY_FILE_COMPLETE: 'copyFileComplete'
+			};
+			expect(actual).to.eql(expected);
+		});
+
+		it('should relay copy events', function() {
+			var unmockCopyEvents = mockCopyEvents(factory);
+
+			var templateFactory = factory({
+				template: getTemplatePath('file')
+			});
+
+			var options = {
+				destination: getOutputPath()
+			};
+			var copier = templateFactory(options);
+			var events = listenTo(copier, COPY_EVENTS);
+
+			return copier.then(function() {
+				var actual = events;
+				var expected = [
+					{ name: 'error', args: [1, 2, 3] },
+					{ name: 'complete', args: [1, 2, 3] },
+					{ name: 'createDirectoryStart', args: [1, 2, 3] },
+					{ name: 'createDirectoryError', args: [1, 2, 3] },
+					{ name: 'createDirectoryComplete', args: [1, 2, 3] },
+					{ name: 'createSymlinkStart', args: [1, 2, 3] },
+					{ name: 'createSymlinkError', args: [1, 2, 3] },
+					{ name: 'createSymlinkComplete', args: [1, 2, 3] },
+					{ name: 'copyFileStart', args: [1, 2, 3] },
+					{ name: 'copyFileError', args: [1, 2, 3] },
+					{ name: 'copyFileComplete', args: [1, 2, 3] }
+				];
+				expect(actual).to.eql(expected);
+			}).finally(function() {
+				unmockCopyEvents();
+			});
+
+
+			function mockCopyEvents(subject) {
+				function copy(options, context, callback) {
+					var copier = new Promise(function(resolve, reject) {
+						setTimeout(function() {
+							emitEvents(emitter);
+							resolve([]);
+						});
+					});
+					var emitter = emitterMixin(copier);
+					return emitter;
+
+
+					function emitEvents(emitter) {
+						emitter.emit('error', 1, 2, 3);
+						emitter.emit('complete', 1, 2, 3);
+						emitter.emit('createDirectoryStart', 1, 2, 3);
+						emitter.emit('createDirectoryError', 1, 2, 3);
+						emitter.emit('createDirectoryComplete', 1, 2, 3);
+						emitter.emit('createSymlinkStart', 1, 2, 3);
+						emitter.emit('createSymlinkError', 1, 2, 3);
+						emitter.emit('createSymlinkComplete', 1, 2, 3);
+						emitter.emit('copyFileStart', 1, 2, 3);
+						emitter.emit('copyFileError', 1, 2, 3);
+						emitter.emit('copyFileComplete', 1, 2, 3);
+					}
+				}
+				copy.events = {
+					ERROR: 'error',
+					COMPLETE: 'complete',
+					CREATE_DIRECTORY_START: 'createDirectoryStart',
+					CREATE_DIRECTORY_ERROR: 'createDirectoryError',
+					CREATE_DIRECTORY_COMPLETE: 'createDirectoryComplete',
+					CREATE_SYMLINK_START: 'createSymlinkStart',
+					CREATE_SYMLINK_ERROR: 'createSymlinkError',
+					CREATE_SYMLINK_COMPLETE: 'createSymlinkComplete',
+					COPY_FILE_START: 'copyFileStart',
+					COPY_FILE_ERROR: 'copyFileError',
+					COPY_FILE_COMPLETE: 'copyFileComplete'
+				};
+				return subject.__set__('copy', copy);
+			}
+		});
+
+		it('should allow event listeners to be chained', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('file')
+			});
+
+			var options = {
+				destination: getOutputPath()
+			};
+			var copier = templateFactory(options);
+
+			var actual, expected;
+			actual = copier.on('complete', function() {});
+			expected = copier;
+			expect(actual).to.equal(expected);
+			return copier;
 		});
 	});
 });

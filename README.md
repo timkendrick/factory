@@ -111,3 +111,69 @@ Returns:
 	Returns:
 
 	- `Promise`: Promise that is fulfilled when the operation completes/fails
+
+## Events
+
+The value returned by the generated factory function implements the `EventEmitter` interface, and emits the following events:
+
+| Event | Handler signature |
+| ----- | ----------------- |
+| `factory.events.ERROR` | `function(error, ErrorInfo)` |
+| `factory.events.COMPLETE` | `function(Array<CopyOperation>)` |
+| `factory.events.CREATE_DIRECTORY_START` | `function(CopyOperation)` |
+| `factory.events.CREATE_DIRECTORY_ERROR` | `function(error, CopyOperation)` |
+| `factory.events.CREATE_DIRECTORY_COMPLETE` | `function(CopyOperation)` |
+| `factory.events.CREATE_SYMLINK_START` | `function(CopyOperation)` |
+| `factory.events.CREATE_SYMLINK_ERROR` | `function(error, CopyOperation)` |
+| `factory.events.CREATE_SYMLINK_COMPLETE` | `function(CopyOperation)` |
+| `factory.events.COPY_FILE_START` | `function(CopyOperation)` |
+| `factory.events.COPY_FILE_ERROR` | `function(error, CopyOperation)` |
+| `factory.events.COPY_FILE_COMPLETE` | `function(CopyOperation)` |
+
+...where the types referred to in the handler signature are as follows:
+
+### `ErrorInfo`
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `src` | `string` | Source path of the file/folder/symlink that failed to copy |
+| `dest` | `string` | Destination path of the file/folder/symlink that failed to copy |
+
+### `CopyOperation`
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `src` | `string` | Source path of the relevant file/folder/symlink |
+| `dest` | `string` | Destination path of the relevant file/folder/symlink |
+| `stats ` | `fs.Stats` | Stats for the relevant file/folder/symlink |
+
+
+### Example: using events
+
+```javascript
+var factory = require('factory');
+
+var widgetFactory = factory({
+	template: 'templates/widget'
+});
+
+var options = {
+	destination: 'app/widgets'
+};
+var context = {};
+widgetFactory(options, context)
+	.on(factory.events.COPY_FILE_START, function(copyOperation) {
+		console.info('Copying file ' + copyOperation.src + '...');
+	})
+	.on(factory.events.COPY_FILE_COMPLETE, function(copyOperation) {
+		console.info('Copied to ' + copyOperation.dest);
+	})
+	.on(factory.events.ERROR, function(error, copyOperation) {
+		console.error('Unable to copy ' + copyOperation.dest);
+	})
+	.then(function(results) {
+		console.info('Widget created successfully');
+	}).catch(function(error) {
+		console.error('Widget creation failed: ' + error);
+	});
+```

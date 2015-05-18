@@ -1,8 +1,10 @@
 'use strict';
 
 var fs = require('fs');
+var EventEmitter = require('events').EventEmitter;
 var Transform = require('stream').Transform;
 var Promise = require('promise');
+var emitterMixin = require('emitter-mixin');
 var errno = require('errno');
 var extend = require('extend');
 var inquirer = require('inquirer');
@@ -14,6 +16,7 @@ module.exports = function(options) {
 	options = options || {};
 	var templatePath = options.template || null;
 	var templatePlaceholders = options.placeholders || [];
+
 
 	return function(options, context, callback) {
 		if ((arguments.length === 2) && (typeof context === 'function')) {
@@ -27,7 +30,9 @@ module.exports = function(options) {
 		}
 		context = context || {};
 		options = options || {};
-		return parseOptions(context, templatePlaceholders)
+
+		var emitter;
+		var promise = parseOptions(context, templatePlaceholders)
 			.then(function(context) {
 				var source = templatePath;
 				var destination = options.destination;
@@ -41,12 +46,23 @@ module.exports = function(options) {
 				}
 				return ensureValidSource(source)
 					.then(function() {
-						return copyDirectory(source, destination, context, options);
+						return copyDirectory(source, destination, context, options, emitter);
 					});
-			})
-			.nodeify(callback);
+			});
+
+		if (typeof callback === 'function') {
+			promise.nodeify(callback);
+			emitter = new EventEmitter();
+		} else {
+			emitter = emitterMixin(promise);
+		}
+
+		return emitter;
 	};
 };
+
+module.exports.events = copy.events;
+
 
 function parseOptions(context, placeholders) {
 	return new Promise(function(resolve, reject) {
@@ -80,8 +96,8 @@ function ensureValidSource(path) {
 	});
 }
 
-function copyDirectory(source, destination, context, options) {
-	return copy(source, destination, {
+function copyDirectory(source, destination, context, options, emitter) {
+	var copier = copy(source, destination, {
 		overwrite: options.overwrite,
 		dot: true,
 		rename: function(filePath) {
@@ -91,6 +107,7 @@ function copyDirectory(source, destination, context, options) {
 			return templateStream(src, context);
 		}
 	});
+	return addEventListeners(copier, emitter);
 
 
 	function templateStream(filename, context) {
@@ -121,6 +138,25 @@ function copyDirectory(source, destination, context, options) {
 		if (!containsPlaceholders) { return templateString; }
 		var templateFunction = template(templateString);
 		return templateFunction(context);
+	}
+
+	function addEventListeners(copier, emitter) {
+		var eventNames = Object.keys(copy.events).map(function(key) {
+			return copy.events[key];
+		});
+		eventNames.forEach(function(eventName) {
+			var listener = createEventListener(eventName);
+			copier.on(eventName, listener);
+		});
+		return copier;
+
+
+		function createEventListener(eventName) {
+			return function(args) {
+				var eventArguments = Array.prototype.slice.call(arguments);
+				emitter.emit.apply(emitter, [eventName].concat(eventArguments));
+			};
+		}
 	}
 }
 
