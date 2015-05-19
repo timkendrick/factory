@@ -94,22 +94,23 @@ Create a factory from an existing template
 
 Template filenames/contents can use [lodash template](https://www.npmjs.com/package/lodash.template) syntax to specify placeholder values. These are injected into the template when the factory function is invoked.
 
-Options:
+#### Options:
 
 | Name | Type | Required | Default | Description |
 | ---- | ---- | -------- | ------- | ----------- |
 | `template` | `string` | Yes | N/A | Path to the template folder |
 | `placeholders` | `Array` | No | `[]` | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
 
-Returns:
 
-- `function(options, [context], [callback])`
+#### Returns:
+
+- #### `function(options, [context], [callback])`
 
  	Factory function used to create instances of the template
 
  	The user will be prompted for the value of any placeholders which are not specified in the `context` object.
 
- 	Options:
+ 	##### Options:
 
  	| Name | Type | Required | Default | Description |
 	| ---- | ---- | -------- | ------- | ----------- |
@@ -118,34 +119,34 @@ Returns:
 	| `context` | `object` | No | `{}` | Preset template placeholder values |
 	| `callback` | `function` | No | `null` | Node-style callback that is invoked when the operation completes/fails |
 
-	Returns:
+	##### Returns:
 
-	- `Promise<Array>` Promise, fulfilled with array of copy results:
+	`Promise<Array>` Promise, fulfilled with array of copy results:
 
-		```json
-		[
-			{
-				"src": "/path/to/src",
-				"dest": "/path/to/dest",
-				"stats": <Stats>
-			},
-			{
-				"src": "/path/to/src/file.txt",
-				"dest": "/path/to/dest/file.txt",
-				"stats": <Stats>
-			},
-			{
-				"src": "/path/to/src/subfolder",
-				"dest": "/path/to/dest/subfolder",
-				"stats": <Stats>
-			},
-			{
-				"src": "/path/to/src/subfolder/nested.txt",
-				"dest": "/path/to/dest/subfolder/nested.txt",
-				"stats": <Stats>
-			}
-		]
-		```
+	```json
+	[
+		{
+			"src": "/path/to/src",
+			"dest": "/path/to/dest",
+			"stats": <Stats>
+		},
+		{
+			"src": "/path/to/src/file.txt",
+			"dest": "/path/to/dest/file.txt",
+			"stats": <Stats>
+		},
+		{
+			"src": "/path/to/src/subfolder",
+			"dest": "/path/to/dest/subfolder",
+			"stats": <Stats>
+		},
+		{
+			"src": "/path/to/src/subfolder/nested.txt",
+			"dest": "/path/to/dest/subfolder/nested.txt",
+			"stats": <Stats>
+		}
+	]
+	```
 
 
 ## Events
