@@ -13,7 +13,7 @@ var Promise = require('promise');
 var readDirFiles = require('read-dir-files');
 var emitterMixin = require('emitter-mixin');
 
-var factory = rewire('../../index');
+var factory = rewire('../../lib/factory');
 
 var TEMPLATES_PATH = path.resolve(__dirname, '../fixtures/templates');
 var OUTPUT_DIR = path.resolve(__dirname, '../fixtures/output');
