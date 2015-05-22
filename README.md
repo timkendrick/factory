@@ -103,6 +103,8 @@ Template filenames/contents can use [lodash template](https://www.npmjs.com/pack
 | `placeholders` | `Array` | No | `[]` | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
 | `getContext` | `function` | No | `null` | Function that transforms placeholder values before they are passed to the template |
 
+##### Notes:
+
 - `getContext` has the following signature:
 
 	##### `function(context)`
