@@ -40,7 +40,7 @@
     "istextorbinary": "^1.0.2",
     "lodash.template": "^3.5.1",
     "promise": "^7.0.1",
-    "recursive-copy": "^1.0.7"
+    "recursive-copy": "^1.0.8"
   },
   "devDependencies": {
     "@timkendrick/node-project": "^1.0.0",
