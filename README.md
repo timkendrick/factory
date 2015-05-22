@@ -78,9 +78,10 @@ module.exports = function baz() {
 
 ## How it works
 
-- The `factory()` function takes two arguments:
+- Call the `factory()` function with the following parameters:
 	- `template`: path to the template folder
-	- `placeholders`: array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates
+	- `placeholders`: (optional) array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates
+	- `getContext`: (optional) function that transforms placeholder values before they are passed to the template
 - You can then call the function that is returned, specifying a destination path and any copy options, and optionally passing in a key/value object containing template placeholder values
 - The user is prompted for the value of any placeholders which were not provided in the placeholder values object
 - The files are copied from the `template` folder to the destination folder, replacing any placeholders in filenames and file content with the supplied values (using [lodash template](https://www.npmjs.com/package/lodash.template) syntax)
@@ -100,6 +101,21 @@ Template filenames/contents can use [lodash template](https://www.npmjs.com/pack
 | ---- | ---- | -------- | ------- | ----------- |
 | `template` | `string` | Yes | N/A | Path to the template folder |
 | `placeholders` | `Array` | No | `[]` | Array of [inquirer](https://www.npmjs.com/package/inquirer) prompts used to gather data for injecting into templates |
+| `getContext` | `function` | No | `null` | Function that transforms placeholder values before they are passed to the template |
+
+- `getContext` has the following signature:
+
+	##### `function(context)`
+
+	###### Arguments:
+
+	| Name | Type | Description |
+	| ---- | ---- | ----------- |
+	| `context` | `object` | Key/value object containing placeholder values, gathered from factory `context` and template `placeholders` |
+
+	###### Returns:
+
+	`object` Key/value object containing transformed context placeholder for use in templates
 
 
 #### Returns:

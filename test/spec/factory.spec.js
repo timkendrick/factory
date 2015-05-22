@@ -331,6 +331,40 @@ describe('factory()', function() {
 				});
 		});
 
+		it('should transform context values', function() {
+			var getContext = sinon.spy(function(context) {
+				return {
+					'foo': context.bar,
+					'bar': context.foo
+				};
+			});
+			var templateFactory = factory({
+				template: getTemplatePath('placeholders-content'),
+				getContext: getContext
+			});
+
+			var options = {
+				destination: getOutputPath()
+			};
+			return templateFactory(options,
+				{
+					foo: 'foo',
+					bar: 'bar'
+				}
+			)
+				.then(function(results) {
+					var actual, expected;
+					actual = fs.readFileSync(getOutputPath('file'), 'utf8');
+					expected = 'barfoo\n';
+					expect(actual).to.equal(expected);
+
+					expect(getContext).to.have.been.calledWith({
+						foo: 'foo',
+						bar: 'bar'
+					});
+				});
+		});
+
 		it('should throw an error on undefined file contents placeholders', function() {
 			var templateFactory = factory({
 				template: getTemplatePath('placeholders-content')
@@ -362,6 +396,26 @@ describe('factory()', function() {
 			};
 			actual = templateFactory(options, context);
 			expected = ReferenceError;
+			return expect(actual).to.be.rejectedWith(expected);
+		});
+
+		it('should throw an error on context transform errors', function() {
+			var templateFactory = factory({
+				template: getTemplatePath('placeholders-content'),
+				getContext: function(context) {
+					throw new Error('Transform error');
+				}
+			});
+
+			var actual, expected;
+			var options = {
+				destination: getOutputPath()
+			};
+			var context = {
+				foo: 'foo'
+			};
+			actual = templateFactory(options, context);
+			expected = 'Transform error';
 			return expect(actual).to.be.rejectedWith(expected);
 		});
 	});
