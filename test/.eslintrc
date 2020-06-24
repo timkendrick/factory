@@ -1,6 +1,7 @@
 {
 	"rules": {
-		"no-unused-expressions": false
+		"no-unused-expressions": "off",
+		"no-use-before-define": "off"
 	},
 	"env": {
 		"mocha": true
